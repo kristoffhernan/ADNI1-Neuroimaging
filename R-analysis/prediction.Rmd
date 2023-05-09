@@ -1,0 +1,298 @@
+---
+title: "Predictions"
+output: html_document
+date: "2023-04-30"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+root_dir = '/scratch/users/neuroimage/conda/data'
+knitr::opts_knit$set(root.dir = root_dir)
+source("~/scripts/R-analysis/utils.R")
+```
+
+
+```{r}
+
+library(nnet)
+library(ggplot2)
+library(MASS)
+library(knitr)
+library(tidyverse)
+library(glmnet)
+library(caret)
+library(psych)
+
+```
+
+
+```{r}
+load(file = file.path(root_dir, "R_data", "pca_wm.Rda"))
+load(file = file.path(root_dir, "R_data", "pca_gm.Rda"))
+load(file = file.path(root_dir, "R_data", "pca_cb.Rda"))
+```
+
+
+
+## Running models
+
+
+Because of our imbalanced dataset, in the multinomial logistic regression we adjust weights inversely proportional to class frequencies in the input data. The idea behind this weight adjustment is to ensure that each class contributes equally to the model fitting process, regardless of class imbalance in the input data. By assigning higher weights to minority classes and lower weights to majority classes, the model is able to give more importance to the minority classes, and avoid being biased towards the majority classes. We calculate this by n_samples / (n_classes * sum(I(y=class_j)))
+
+
+```{r}
+
+# balance weighted
+wm_mn <- mn_reg(pca_wm)
+gm_mn <- mn_reg(pca_gm)
+cb_mn <- mn_reg(pca_cb)
+
+# balance weighted
+wm_mn_nw <- mn_reg(pca_wm, weight=FALSE)
+gm_mn_nw <- mn_reg(pca_gm, weight=FALSE)
+cb_mn_nw <- mn_reg(pca_cb, weight=FALSE)
+
+
+```
+#### Coefficient Log(lambda) plots
+This is just like l1 norm (Lasso) where as you increase your penalty, you can see the coefficients shrinking to zero. 
+
+
+
+# https://stats.stackexchange.com/a/186907
+#### Explanation of Deviance Log(lambda) plots
+Deviance is a specific transformation of a likelihood ratio. In particular, we consider the model-based likelihood after some fitting has been done and compare this to the likelihood of what is called the saturated model. This latter is a model that has as many parameters as data points and achieves a perfect fit, so by looking at the likelihood ratio we're measuring in some sense how far our fitted model is from a "perfect" model.
+
+here we can see the cross validated fit for each log(lambda) you can see the upper and lower standard deviations with the points the first line is the lambda min that gives the minimum mean cross-validated misclassificaiton error the one to the right  is the value of lambda that gives the most regularized model such that the cross-validated error is within one standard error of the minimum.
+
+
+
+
+
+
+## Summaries
+
+If we look at the coefficient section, we're seeing two models, one modelling the effect of principal components 1:n on the log odds of predicting MCI over CN, while the next model is predicting AD over CN. In multinomial logistic regression, we are estimating coefficients for each level of the response variable (MCI, AD, or CN) relative to a baseline level (CN).
+
+We can interpret the coefficients as say for PC1 and 1. Each additional unit of PC1 decreases the log odds of predicting MCI over CN by 0.001449435. This doesn't tell you much, but its good practice to try and interpret. 
+
+
+
+
+
+
+## confusion matrix
+```{r}
+
+wm_mn$cm
+gm_mn$cm
+cb_mn$cm
+
+wm_mn_nw$cm
+gm_mn_nw$cm
+cb_mn_nw$cm
+
+
+```
+
+One problem with accuracy is that if we have unbalanced data, it can be deceiving. Imagine you have two classes apples (99% of the data) and oranges (1% of the data). We might have a 99% accuracy even though we wrongly predicted the orange. This would be wrong. In our case, we have examples like with our white matter multinomial model where we have an 86% accuracy, but if we split it up by each group, the accracy is high because we correctly classified 40/41 MCI. However, we only correctly classified AD 8/16. 
+
+Initially, we faced challenges in getting accurate results due to unbalanced splits, as our test data would sometimes consist mostly of MCI and CN samples, with very few AD samples. To solve this we split the data proportionally and got better results like the above. 
+
+To explain, in our full dataset proportionally there are 151/434 (0.348) CN, 206/434 (.475) MCI, and 77/434 (0.177) AD. Originally we then did an 80/20 split, where 80% or 347 of the 434 samples are set aside for the train and 87 are set aside for the test. However, this time, of those 347 sample, 34.8% will be CN, 47.5% will be MCI and 17.7% will be AD.
+
+This misclassification can cause further problems as having a false negative (failing to classifying someone as AD and instead saying theyre CN) can be more fatal and thus should have a higher weight. 
+
+
+
+
+## LDA
+```{r}
+wm_lda <- lda_reg(pca_wm)
+gm_lda <- lda_reg(pca_gm)
+cb_lda <- lda_reg(pca_cb)
+```
+
+
+```{r}
+
+wm_lda$cm
+gm_lda$cm
+cb_lda$cm
+
+```
+
+
+## LDA Assumptions
+
+#### Homoskedasticity Among Classes
+
+
+Bartlett's K-Squared Test 
+
+
+$H_0: \sigma_{CN} = \sigma_{MCI} = \sigma_{AD}$ Variance is the same across all classes
+
+$H_1: \sigma_{CN} \neq \sigma_{MCI} \neq \sigma_{AD}$ Variance isn't the same across all classes
+
+$\alpha = 0.05$
+
+```{r}
+
+## Bart Test
+b_test_wm <- bart_test(pca_wm)
+head(b_test_wm$var_df)
+
+class_data_wm <- b_test_wm$class_data
+
+##
+b_test_gm <- bart_test(pca_gm)
+head(b_test_gm$var_df)
+
+class_data_gm <- b_test_gm$class_data_wm
+
+##
+b_test_cb <- bart_test(pca_cb)
+head(b_test_cb$var_df)
+
+class_data_cb <- b_test_cb$class_data_gm
+
+```
+
+
+#### Normality Among Classes
+
+Kolmogorov-Smirnov Normality Test
+
+$H_0: X_{ik} \sim \text{Normal}(\mu, \sigma) \forall i \in {1,...,n}, k \in {0,1,2}$ Feature follows a normal distribution 
+
+$H_1:$ Feature does not follow a normal distribution
+
+$\alpha = 0.05$
+
+
+
+```{r}
+
+## KS Test
+k_test_wm <- ks_test(pca_wm)
+
+head(k_test_wm$ks_df)
+head(k_test_wm$normal_pcs)
+k_test_wm$non_normal_pcs %>%
+    summarise(non_normal_count = n())
+
+
+k_test_gm <- ks_test(pca_gm)
+
+head(k_test_gm$ks_df)
+head(k_test_gm$normal_pcs)
+k_test_gm$non_normal_pcs %>%
+    summarise(non_normal_count = n())
+
+
+k_test_cb <- ks_test(pca_cb)
+
+head(k_test_cb$ks_df)
+head(k_test_cb$normal_pcs)
+k_test_cb$non_normal_pcs %>%
+    summarise(non_normal_count = n())
+
+
+```
+We reject the null for each feature for all classes. LDA assumptions are not met.
+
+
+
+
+
+
+Precision for class i: TP_i / (TP_i + FP_i)
+
+Recall for class i: TP_i / (TP_i + FN_i)
+
+
+TP_i = True Positives for class i (number of instances correctly classified as class i)
+
+FP_i = False Positives for class i (number of instances incorrectly classified as class i)
+
+FN_i = False Negatives for class i (number of instances incorrectly classified as not class i, but actually belong to class i)
+
+
+
+
+
+
+## Method comparison
+```{r}
+
+df <- data.frame(rbind(get_other_scores_table(wm_mn$scores),
+                 get_other_scores_table(gm_mn$scores),
+                 get_other_scores_table(cb_mn$scores)))
+
+rownames(df) <- NULL
+df <- df %>%
+    mutate(model = c('White matter', rep('',2),
+                     'Gray matter', rep('',2), 
+                     'Combined matter', rep('',2)),
+      score = rep(c('precision', 'recall', 'f1'), 3)) %>% 
+    select(model, score, everything())
+kable(df, caption='Multinomial Logistic Regression Scores')
+
+
+
+
+df <- data.frame(rbind(get_other_scores_table(wm_lda$scores),
+                 get_other_scores_table(gm_lda$scores),
+                 get_other_scores_table(cb_lda$scores)))
+
+rownames(df) <- NULL
+df <- df %>%
+    mutate(model = c('White matter', rep('',2),
+                     'Gray matter', rep('',2), 
+                     'Combined matter', rep('',2)),
+      score = rep(c('precision', 'recall', 'f1'), 3)) %>% 
+    select(model, score, everything())
+kable(df, caption='LDA Scores')
+
+
+
+
+df <- data.frame(model = c('Multinomial', rep('',2),
+                           'Multinomial nw', rep('',2),
+                           'LDA', rep('',2)),
+           plane = rep(c('White matter', 'Gray matter', 'Combined matter'), 3),
+           rbind(wm_mn$scores[[4]], 
+                 gm_mn$scores[[4]],
+                 cb_mn$scores[[4]],
+                 wm_mn_nw$scores[[4]],
+                 gm_mn_nw$scores[[4]],
+                 cb_mn_nw$scores[[4]],
+                 wm_lda$scores[[4]],
+                 gm_lda$scores[[4]],
+                 cb_lda$scores[[4]]
+                ))
+                
+kable(df, caption='Accuracies across models')
+
+
+df <- data.frame(model = c('Multinomial', rep('',2),
+                           'Multinomial nw', rep('',2),
+                           'LDA', rep('',2)),
+           plane = rep(c('White matter', 'Gray matter', 'Combined matter'), 3),
+           rbind(wm_mn$scores[[5]], 
+                 gm_mn$scores[[5]],
+                 cb_mn$scores[[5]],
+                 wm_mn_nw$scores[[5]],
+                 gm_mn_nw$scores[[5]],
+                 cb_mn_nw$scores[[5]],
+                 wm_lda$scores[[5]],
+                 gm_lda$scores[[5]],
+                 cb_lda$scores[[5]]
+                ))
+  
+kable(df, caption='Scores across models')
+
+
+```
+

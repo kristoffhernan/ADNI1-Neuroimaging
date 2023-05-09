@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/accounts/class/s222/neuroimage/scripts/log_model.py", line 194, in <module>
+    X_wm, X_gm = imgs_to_matrix(img_path, smt_files_gm, smt_files_wm, combine=False)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/accounts/class/s222/neuroimage/scripts/log_model.py", line 71, in imgs_to_matrix
+    img = ants.image_read(os.path.join(directory, path))
+          ^^^^
+NameError: name 'ants' is not defined

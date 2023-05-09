@@ -1,0 +1,15 @@
+[NbConvertApp] Converting notebook clinical.ipynb to pdf
+0.00s - Debugger warning: It seems that frozen modules are being used, which may
+0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+0.00s - to python to disable frozen modules.
+0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+[NbConvertApp] WARNING | Wait for final termination of kernel timed out - continuing...
+[NbConvertApp] Support files will be in clinical_files/
+[NbConvertApp] Making directory ./clinical_files
+[NbConvertApp] Writing 37160 bytes to notebook.tex
+[NbConvertApp] Building PDF
+[NbConvertApp] Running xelatex 3 times: ['xelatex', 'notebook.tex', '-quiet']
+[NbConvertApp] Running bibtex 1 time: ['bibtex', 'notebook']
+[NbConvertApp] WARNING | bibtex had problems, most likely because there were no citations
+[NbConvertApp] PDF successfully created
+[NbConvertApp] Writing 43819 bytes to clinical.pdf

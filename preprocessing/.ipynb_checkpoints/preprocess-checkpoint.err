@@ -1,0 +1,24 @@
+2023-04-23 01:34:50.082178: I tensorflow/tsl/cuda/cudart_stub.cc:28] Could not find cuda drivers on your machine, GPU will not be used.
+2023-04-23 01:34:50.409592: I tensorflow/tsl/cuda/cudart_stub.cc:28] Could not find cuda drivers on your machine, GPU will not be used.
+2023-04-23 01:34:50.410845: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2023-04-23 01:34:52.715942: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+Traceback (most recent call last):
+  File "/accounts/class/s222/neuroimage/scripts/preprocess.py", line 473, in <module>
+    
+  File "/accounts/class/s222/neuroimage/scripts/preprocess.py", line 458, in full_preprocess
+    results = pool.map(self.process_img, imgs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/multiprocessing/pool.py", line 367, in map
+    return self._map_async(func, iterable, mapstar, chunksize).get()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/multiprocessing/pool.py", line 774, in get
+    raise self._value
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/multiprocessing/pool.py", line 540, in _handle_tasks
+    put(task)
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/multiprocessing/connection.py", line 205, in send
+    self._send_bytes(_ForkingPickler.dumps(obj))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/multiprocessing/reduction.py", line 51, in dumps
+    cls(buf, protocol).dump(obj)
+TypeError: cannot pickle 'PyCapsule' object

@@ -1,0 +1,7 @@
+
+
+processing file: prediction.Rmd
+Quitting from lines 27-66 (prediction.Rmd) 
+Error in is.data.frame(data) : object 'pca_ls_wm' not found
+Calls: <Anonymous> ... <Anonymous> -> model.frame.default -> is.data.frame
+Execution halted

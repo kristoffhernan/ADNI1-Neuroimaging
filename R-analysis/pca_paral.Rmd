@@ -1,0 +1,90 @@
+---
+title: "Test"
+output: html_document
+date: "2023-04-30"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+root_dir = '/scratch/users/neuroimage/conda/data'
+knitr::opts_knit$set(root.dir = root_dir)
+source("~/scripts/R-analysis/utils.R")
+```
+
+```{r}
+# load required libraries
+library(parallel)
+library(dplyr)
+library(stats)
+library(knitr)
+library(caret)
+library(ggplot2)
+```
+
+
+## Load RDAs
+```{r}
+
+load(file = file.path(root_dir,"R_data","X_wm.Rda"))
+load(file = file.path(root_dir,"R_data","X_gm.Rda"))
+load(file = file.path(root_dir,"R_data","X_cb.Rda"))
+
+```
+
+
+
+## PCA
+```{r}
+
+# fnto perform PCA and save output
+perform_pca_save <- function(ls, node) {
+  pca <- perform_pca(ls)
+  save(pca, file = file.path(root_dir, "R_data", paste0("pca_", node, ".Rda")))
+  return(pca)
+}
+
+# Set num cores
+num_cores <- 3
+
+# create cluster
+cl <- makeCluster(num_cores)
+
+# export data, functions, and variables to cluster
+clusterExport(cl, c("perform_pca_save", "perform_pca", "root_dir", "X_wm", "X_gm", "X_cb"))
+clusterEvalQ(cl, {
+  library(caret)
+  library(dplyr)
+  library(stats)
+  library(foreach)
+})
+
+# parallelize, split the input data into subsets
+ls_list <- list(X_wm, X_gm, X_cb)
+results <- parLapply(cl, ls_list, function(ls) {
+  pca <- perform_pca_save(ls, "ls")
+  return(pca)
+})
+
+# Combine the results
+pca_ls_wm <- results[[1]]
+pca_ls_gm <- results[[2]]
+pca_ls_cb <- results[[3]]
+
+# Stop the cluster
+stopCluster(cl)
+
+head(pca_ls_wm$X_train_pca)
+dim(pca_ls_wm$X_train_pca)
+
+head(pca_ls_wm$y_train)
+
+head(pca_ls_wm$X_test_pca)
+dim(pca_ls_wm$X_test_pca)
+
+```
+
+
+
+
+
+

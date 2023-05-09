@@ -1,0 +1,126 @@
+---
+title: "Neuroimaging-Project-230"
+output: pdf_document
+date: "2023-04-19"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+root_dir = '/scratch/users/neuroimage/conda/data'
+knitr::opts_knit$set(root.dir = root_dir)
+```
+
+
+
+## Load libraries
+```{r}
+library(oro.nifti)
+library(neurobase)
+library(tidyverse)
+library(ggplot2)
+library(gridExtra)
+library(caret)
+library(knitr)
+source("~/scripts/R-analysis/utils.R")
+```
+
+## Creating list of white matter and gray matter paths
+```{r}
+
+# image directory
+img_dir <- 'preprocessed/imgsss'
+
+# creating full list of gm and wm files
+all_MRI_files <- get_ordered_files(img_dir, 'smt')
+
+# splitting into wm and gm
+gm_files <- all_MRI_files[[1]]
+wm_files <- all_MRI_files[[2]]
+
+gm_files[1:3]
+
+```
+
+
+## Visualizing the MRI images
+```{r}
+
+# load all Nifti object images
+nifti_images_gm <- lapply(gm_files[1:2], readNIfTI)
+
+nifti_images_wm <- lapply(wm_files[1:2], readNIfTI)
+
+# all slices from the axial plane of 1 image
+oro.nifti::image(x=nifti_images_gm[[1]], plane=c('axial'), plot.type=c("multiple"))
+oro.nifti::image(x=nifti_images_wm[[1]], plane=c('axial'), plot.type=c("multiple"))
+
+# slice 52 of axial plane 
+oro.nifti::image(x=nifti_images_gm[[2]], z=52, plane=c('axial'), plot.type=c("single"))
+
+# all 3 planes of the MRI image spatially aligned
+ortho2(nifti_images_gm[[1]])
+ortho2(nifti_images_wm[[1]])
+
+```
+
+
+
+
+## Reading in and cleaning metadata 
+```{r}
+
+# read in metadata
+metadata_fname <- "ADNI1_Complete_2Yr_3T_4_18_2023.csv"
+md <- read_csv(metadata_fname, show_col_types = FALSE)
+
+# select usable features and make into dummie vars
+md <- md %>%
+  select(`Image Data ID`, Subject, Group, Sex, Age) %>%
+  rename(Image_ID = `Image Data ID`) %>%
+  mutate(Sex = ifelse(Sex=='M', 0, 1),
+         Group = case_when(
+            Group == 'CN' ~ 0,
+            Group == 'MCI' ~ 1,
+            Group == 'AD' ~ 2,
+            TRUE ~ NA_integer_
+         ))
+
+head(md)
+
+```
+
+
+## Creating the design matrix
+```{r}
+
+X_wm <- create_design_mat(md, file_ls=wm_files)
+save(X_wm, file = file.path(root_dir, "R_data", "X_wm.Rda"))
+
+X <- X_wm$X
+y <- X_wm$y
+
+dim(X)
+
+kable(X[3:8,500000:500005], format = "markdown")
+
+head(as.vector(unique(X[3:8,500000:500005])))
+
+summary(X[3:8,500000:500005])
+
+X_gm <- create_design_mat(md, file_ls=gm_files)
+save(X_gm, file = file.path(root_dir, "R_data", "X_gm.Rda"))
+
+X_cb <- create_design_mat(md, wm_files, wm_files, gm_files, comb=TRUE)
+save(X_cb, file = file.path(root_dir, "R_data", "X_cb.Rda"))
+
+
+```
+
+
+
+
+
+
+
+
+

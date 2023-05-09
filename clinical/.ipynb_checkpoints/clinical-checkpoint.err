@@ -1,0 +1,81 @@
+[NbConvertApp] Converting notebook clinical.ipynb to pdf
+0.00s - Debugger warning: It seems that frozen modules are being used, which may
+0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+0.00s - to python to disable frozen modules.
+0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+Traceback (most recent call last):
+  File "/usr/local/linux/mambaforge-3.11/bin/jupyter-nbconvert", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/site-packages/jupyter_core/application.py", line 276, in launch_instance
+    return super().launch_instance(argv=argv, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/site-packages/traitlets/config/application.py", line 985, in launch_instance
+    app.start()
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 423, in start
+    self.convert_notebooks()
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 597, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 560, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 488, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 189, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 206, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/site-packages/nbconvert/exporters/pdf.py", line 181, in from_notebook_node
+    latex, resources = super().from_notebook_node(nb, resources=resources, **kw)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/site-packages/nbconvert/exporters/latex.py", line 74, in from_notebook_node
+    return super().from_notebook_node(nb, resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/site-packages/nbconvert/exporters/templateexporter.py", line 397, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 146, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 335, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/site-packages/nbconvert/preprocessors/base.py", line 47, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 89, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 110, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 160, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/asyncio/base_events.py", line 650, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/site-packages/nbclient/client.py", line 1021, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/usr/local/linux/mambaforge-3.11/lib/python3.11/site-packages/nbclient/client.py", line 915, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+import pandas as pd
+import os
+import numpy as np
+import ut
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mModuleNotFoundError[0m                       Traceback (most recent call last)
+Cell [0;32mIn[1], line 4[0m
+[1;32m      2[0m [38;5;28;01mimport[39;00m [38;5;21;01mos[39;00m
+[1;32m      3[0m [38;5;28;01mimport[39;00m [38;5;21;01mnumpy[39;00m [38;5;28;01mas[39;00m [38;5;21;01mnp[39;00m
+[0;32m----> 4[0m [38;5;28;01mimport[39;00m [38;5;21;01mut[39;00m
+
+[0;31mModuleNotFoundError[0m: No module named 'ut'
+ModuleNotFoundError: No module named 'ut'
+

@@ -1,0 +1,53 @@
+---
+title: "Predictions"
+output: html_document
+date: "2023-04-30"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+root_dir = '/scratch/users/neuroimage/conda/data'
+knitr::opts_knit$set(root.dir = root_dir)
+source("~/scripts/R-analysis/utils.R")
+```
+
+
+```{r}
+library(gridExtra)
+library(ggplot2)
+library(dplyr)
+
+load(file = file.path(root_dir, "R_data", "pca_wm.Rda"))
+load(file = file.path(root_dir, "R_data", "pca_gm.Rda"))
+load(file = file.path(root_dir, "R_data", "pca_cb.Rda"))
+```
+
+
+## Cumulative Variance
+```{r}
+
+p1 <- plot_cumul_var(pca_wm$cum_var, ": White Matter")
+p2 <- plot_cumul_var(pca_gm$cum_var, ": Gray Matter")
+p3 <- plot_cumul_var(pca_cb$cum_var, ": White + Gray Matter")
+
+p1
+p2
+p3
+
+```
+
+
+
+## PC1 PC2 Feature Space
+```{r}
+
+p1 <- plot_pc1_pc2(pca_wm$X_train_pca, pca_wm$y_train, pca_wm$X_test_pca, pca_wm$y_test, pca_wm$prop_var, ": white matter")
+p2 <- plot_pc1_pc2(pca_gm$X_train_pca, pca_gm$y_train, pca_gm$X_test_pca, pca_gm$y_test, pca_gm$prop_var, ": gray matter")
+p3 <- plot_pc1_pc2(pca_cb$X_train_pca, pca_cb$y_train, pca_cb$X_test_pca, pca_cb$y_test, pca_cb$prop_var, ": white + gray Matter")
+
+p1
+p2
+p3
+
+```
+

@@ -1,0 +1,65 @@
+---
+title: "Test"
+output: html_document
+date: "2023-04-30"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+root_dir = '/scratch/users/neuroimage/conda/data'
+knitr::opts_knit$set(root.dir = root_dir)
+source("~/scripts/R-analysis/utils.R")
+```
+
+```{r}
+# load required libraries
+library(parallel)
+library(dplyr)
+library(stats)
+library(knitr)
+library(caret)
+library(ggplot2)
+library(foreach)
+```
+
+
+## Load RDAs
+```{r}
+
+#load(file = file.path(root_dir,"R_data","X_wm.Rda"))
+#load(file = file.path(root_dir,"R_data","X_gm.Rda"))
+load(file = file.path(root_dir,"R_data","X_cb.Rda"))
+
+```
+
+
+
+## PCA
+```{r}
+
+# fnto perform PCA and save output
+pca_cb <- perform_pca(X_cb)
+save(pca_cb, file = file.path(root_dir, "R_data", "pca_cb.Rda"))
+
+
+# standard deviations
+head(pca_cb$sdev)
+
+
+head(pca_cb$X_train_pca[,1:5])
+dim(pca_cb$X_train_pca)
+
+head(pca_cb$y_train)
+length(pca_cb$y_train)
+length(pca_cb$y_test)
+
+head(pca_cb$X_test_pca[,1:5])
+dim(pca_cb$X_test_pca)
+
+```
+
+
+
+
+
+

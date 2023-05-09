@@ -1,0 +1,7 @@
+
+
+processing file: pca_visualize.Rmd
+Quitting from lines 43-52 (pca_visualize.Rmd) 
+Error in data.frame(X_test_pca) : object 'X_test_pca' not found
+Calls: <Anonymous> ... plot_pc1_pc2 -> %>% -> mutate -> select -> data.frame
+Execution halted
