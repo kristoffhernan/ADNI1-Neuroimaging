@@ -210,6 +210,7 @@ calc_loading_vec <- function(pca_ls, n_components) {
     # Ax = b -> x = A^{-1}b
     A_pinv <- pinv(as.matrix(pca_ls$X_train))
     b <- as.matrix(pca_ls$X_train_pca)
+    # x is the projection matrix
     x <- A_pinv %*% b
     
     # we only care about the magnitude of the loading vector. it can be positive or negative and will indicate significant contribution
@@ -467,7 +468,7 @@ get_other_scores_table <- function(scores) {
 
 
 balanced_weights <- function() {
-        N <- 435
+        N <- 434
         n_classes <- 3
     
         cn_w <- N / (n_classes * 151)
@@ -525,7 +526,7 @@ mn_reg <- function(pca_ls,weight=TRUE) {
     
     plot(clf)
     
-  return(calc_scores(clf, pca_ls, mod='mn', sim=TRUE))
+  return(calc_scores(clf, pca_ls, mod='mn', sim=FALSE))
 }
 
 
@@ -534,7 +535,7 @@ lda_reg <- function(pca_ls) {
   # Fit logistic regression model
   clf <- lda(pca_ls$y_train ~ ., data = pca_ls$X_train_pca)
   
-  return(calc_scores(clf, pca_ls, mod='lda', sim=TRUE))
+  return(calc_scores(clf, pca_ls, mod='lda', sim=FALSE))
 }
 
 
@@ -565,7 +566,9 @@ bart_test <- function(pca_data) {
     class_data <- split(pca_data$X_train_pca, pca_data$y_train)
 
     # Calculate variances of each column in each class
-    variances <- matrix(NA, nrow = ncol(pca_data$X_train_pca), ncol = length(class_data), dimnames = list(NULL,c("CN", "MCI", "AD")))
+    variances <- matrix(NA, nrow = ncol(pca_data$X_train_pca), 
+                        ncol = length(class_data), 
+                        dimnames = list(NULL,c("CN", "MCI", "AD")))
 
     for (i in 1:length(class_data)) {
       vars <- sapply(class_data[[i]], var)

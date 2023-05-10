@@ -47,11 +47,6 @@ wm_mn <- mn_reg(pca_wm)
 gm_mn <- mn_reg(pca_gm)
 cb_mn <- mn_reg(pca_cb)
 
-# balance weighted
-wm_mn_nw <- mn_reg(pca_wm, weight=FALSE)
-gm_mn_nw <- mn_reg(pca_gm, weight=FALSE)
-cb_mn_nw <- mn_reg(pca_cb, weight=FALSE)
-
 
 ```
 #### Coefficient Log(lambda) plots
@@ -88,9 +83,6 @@ wm_mn$cm
 gm_mn$cm
 cb_mn$cm
 
-wm_mn_nw$cm
-gm_mn_nw$cm
-cb_mn_nw$cm
 
 
 ```
@@ -259,15 +251,11 @@ kable(df, caption='LDA Scores')
 
 
 df <- data.frame(model = c('Multinomial', rep('',2),
-                           'Multinomial nw', rep('',2),
                            'LDA', rep('',2)),
-           plane = rep(c('White matter', 'Gray matter', 'Combined matter'), 3),
+           plane = rep(c('White matter', 'Gray matter', 'Combined matter'), 2),
            rbind(wm_mn$scores[[4]], 
                  gm_mn$scores[[4]],
                  cb_mn$scores[[4]],
-                 wm_mn_nw$scores[[4]],
-                 gm_mn_nw$scores[[4]],
-                 cb_mn_nw$scores[[4]],
                  wm_lda$scores[[4]],
                  gm_lda$scores[[4]],
                  cb_lda$scores[[4]]
@@ -277,15 +265,11 @@ kable(df, caption='Accuracies across models')
 
 
 df <- data.frame(model = c('Multinomial', rep('',2),
-                           'Multinomial nw', rep('',2),
                            'LDA', rep('',2)),
-           plane = rep(c('White matter', 'Gray matter', 'Combined matter'), 3),
+           plane = rep(c('White matter', 'Gray matter', 'Combined matter'), 2),
            rbind(wm_mn$scores[[5]], 
                  gm_mn$scores[[5]],
                  cb_mn$scores[[5]],
-                 wm_mn_nw$scores[[5]],
-                 gm_mn_nw$scores[[5]],
-                 cb_mn_nw$scores[[5]],
                  wm_lda$scores[[5]],
                  gm_lda$scores[[5]],
                  cb_lda$scores[[5]]

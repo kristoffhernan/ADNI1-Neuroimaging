@@ -1,6 +1,16 @@
+---
+title: "Utils"
+output: html_document
+date: "2023-04-30"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
 
 
+```{r}
 get_ordered_files <- function(img_dir, prefix) {
   
     # filtering by prefix and suffix
@@ -623,7 +633,7 @@ ks_test <- function(pca_data) {
 }
 
 
-
+```
 
 
 
